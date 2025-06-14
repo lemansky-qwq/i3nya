@@ -5,6 +5,9 @@ import Games from './pages/games';
 import GameClick from './pages/gameclick';
 import NotFound from './pages/notfound';
 import Navbar from './components/navbar';
+import JumpGame from './pages/jump';
+
+
 
 export default function App() {
   return (
@@ -17,6 +20,7 @@ export default function App() {
           <Route path="/games" element={<Games />} />
           <Route path="/games/click" element={<GameClick />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/games/jump" element={<JumpGame />} />
         </Routes>
       </div>
     </>
