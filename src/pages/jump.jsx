@@ -1,4 +1,4 @@
-// src/pages/jump.jsx - v3.2 添加视角跟随角色（横向位移）
+// src/pages/jump.jsx - v3.3 精确判断是否跳到下一个平台，未命中不生成新台子
 import { useEffect, useRef, useState } from 'react';
 
 export default function JumpGame() {
@@ -15,8 +15,6 @@ export default function JumpGame() {
   const [chargeStart, setChargeStart] = useState(0);
   const [isJumping, setIsJumping] = useState(false);
 
-  const gravity = 1;
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -26,24 +24,19 @@ export default function JumpGame() {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 计算视角偏移量，使玩家始终在画面中心靠左一点
       const viewOffset = Math.max(0, player.x - 150);
 
-      // 地面
       ctx.fillStyle = '#eee';
       ctx.fillRect(0, 280, canvas.width, 20);
 
-      // 平台
       ctx.fillStyle = '#888';
       platforms.forEach(p => {
         ctx.fillRect(p.x - viewOffset, 260, p.width, 20);
       });
 
-      // 玩家
       ctx.fillStyle = gameOver ? 'red' : '#007bff';
       ctx.fillRect(player.x - viewOffset, player.y, 20, 20);
 
-      // 分数
       ctx.fillStyle = '#333';
       ctx.font = '16px sans-serif';
       ctx.fillText(`得分：${score}`, 10, 20);
@@ -81,9 +74,10 @@ export default function JumpGame() {
   };
 
   const finishJump = (x) => {
-    const landed = platforms.some(p => x + 10 >= p.x && x + 10 <= p.x + p.width);
+    const landedPlatform = platforms.find(p => x + 10 >= p.x && x + 10 <= p.x + p.width);
+    const nextPlatform = platforms[platforms.length - 1];
 
-    if (!landed) {
+    if (!landedPlatform || landedPlatform !== nextPlatform) {
       setGameOver(true);
       if (score > highScore) {
         setHighScore(score);
@@ -92,9 +86,8 @@ export default function JumpGame() {
     } else {
       setPlayer({ x, y: 250 });
       setScore(prev => prev + 1);
-      const lastPlatform = platforms[platforms.length - 1];
       const newPlatform = {
-        x: lastPlatform.x + 80 + Math.random() * 60,
+        x: nextPlatform.x + 80 + Math.random() * 60,
         width: 60 + Math.random() * 40,
       };
       setPlatforms([...platforms, newPlatform]);
