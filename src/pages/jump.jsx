@@ -1,4 +1,4 @@
-// src/pages/jump.jsx - v3 蓄力跳跃 + 动画跳跃 + 计分
+// src/pages/jump.jsx - v3.2 添加视角跟随角色（横向位移）
 import { useEffect, useRef, useState } from 'react';
 
 export default function JumpGame() {
@@ -16,29 +16,38 @@ export default function JumpGame() {
   const [isJumping, setIsJumping] = useState(false);
 
   const gravity = 1;
-  const jumpBase = 10;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    canvas.width = 400;
+    canvas.width = 600;
     canvas.height = 300;
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 计算视角偏移量，使玩家始终在画面中心靠左一点
+      const viewOffset = Math.max(0, player.x - 150);
+
+      // 地面
       ctx.fillStyle = '#eee';
       ctx.fillRect(0, 280, canvas.width, 20);
 
+      // 平台
       ctx.fillStyle = '#888';
-      platforms.forEach(p => ctx.fillRect(p.x, 260, p.width, 20));
+      platforms.forEach(p => {
+        ctx.fillRect(p.x - viewOffset, 260, p.width, 20);
+      });
 
+      // 玩家
       ctx.fillStyle = gameOver ? 'red' : '#007bff';
-      ctx.fillRect(player.x, player.y, 20, 20);
+      ctx.fillRect(player.x - viewOffset, player.y, 20, 20);
 
+      // 分数
       ctx.fillStyle = '#333';
       ctx.font = '16px sans-serif';
       ctx.fillText(`得分：${score}`, 10, 20);
-      ctx.fillText(`最高分：${highScore}`, 280, 20);
+      ctx.fillText(`最高分：${highScore}`, 460, 20);
     };
 
     draw();
@@ -46,7 +55,7 @@ export default function JumpGame() {
 
   const animateJump = (power) => {
     setIsJumping(true);
-    const distance = Math.min(160, power * 2); // 限制最大距离
+    const distance = Math.min(200, power * 2);
     const jumpHeight = Math.min(100, power * 1.5);
 
     let frame = 0;
@@ -58,7 +67,7 @@ export default function JumpGame() {
       frame++;
       const t = frame / totalFrames;
       const x = startX + distance * t;
-      const y = startY - (4 * jumpHeight * t * (1 - t)); // 抛物线
+      const y = startY - (4 * jumpHeight * t * (1 - t));
       setPlayer({ x, y });
 
       if (frame < totalFrames) {
@@ -114,7 +123,7 @@ export default function JumpGame() {
   const releaseJump = () => {
     if (charging && !isJumping && !gameOver) {
       const duration = performance.now() - chargeStart;
-      const power = Math.min(duration / 10, 80); // 蓄力限制
+      const power = Math.min(duration / 10, 100);
       setCharging(false);
       animateJump(power);
     }
