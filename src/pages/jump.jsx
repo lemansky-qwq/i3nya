@@ -1,4 +1,4 @@
-// src/pages/jump.jsx - v3.3 精确判断是否跳到下一个平台，未命中不生成新台子
+// src/pages/jump.jsx - v6.4 精准判断只允许跳到“当前目标平台”，否则不加分不生成
 import { useEffect, useRef, useState } from 'react';
 
 export default function JumpGame() {
@@ -30,7 +30,8 @@ export default function JumpGame() {
       ctx.fillRect(0, 280, canvas.width, 20);
 
       ctx.fillStyle = '#888';
-      platforms.forEach(p => {
+      platforms.forEach((p, i) => {
+        ctx.fillStyle = (i === platforms.length - 1) ? '#555' : '#888';
         ctx.fillRect(p.x - viewOffset, 260, p.width, 20);
       });
 
@@ -74,10 +75,10 @@ export default function JumpGame() {
   };
 
   const finishJump = (x) => {
-    const landedPlatform = platforms.find(p => x + 10 >= p.x && x + 10 <= p.x + p.width);
     const nextPlatform = platforms[platforms.length - 1];
+    const onTarget = x + 10 >= nextPlatform.x && x + 10 <= nextPlatform.x + nextPlatform.width;
 
-    if (!landedPlatform || landedPlatform !== nextPlatform) {
+    if (!onTarget) {
       setGameOver(true);
       if (score > highScore) {
         setHighScore(score);
