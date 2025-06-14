@@ -24,6 +24,17 @@ export default function About() {
           东篱十三巷
         </a>
       </p>
+      <h2>友情链接</h2>
+      <p>
+        <a href="https://gu-ing.pages.dev" target="_blank" rel="noopener noreferrer">
+          Gu-ing之首页
+        </a>
+      </p>
+      <p>
+        <a href="https://gugu114.pages.dev" target="_blank" rel="noopener noreferrer">
+          Gugu的小窝
+        </a>
+      </p>
 
       <hr style={{ margin: '2em 0' }} />
 
