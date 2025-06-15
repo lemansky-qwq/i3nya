@@ -6,6 +6,9 @@ import GameClick from './pages/gameclick';
 import NotFound from './pages/notfound';
 import Navbar from './components/navbar';
 import JumpGame from './pages/jump';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+
 
 
 
@@ -21,6 +24,8 @@ export default function App() {
           <Route path="/games/click" element={<GameClick />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/games/jump" element={<JumpGame />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </>
