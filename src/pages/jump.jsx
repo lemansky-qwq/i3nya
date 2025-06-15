@@ -193,31 +193,6 @@ export default function JumpGame() {
                     {charging ? '蓄力中...' : '跳！'}
                 </button>
             )}
-            <div style={{ marginTop: '2rem' }}>
-            <button onClick={() => {
-                setShowLeaderboard(!showLeaderboard);
-                if (!showLeaderboard) fetchLeaderboard();
-            }}>
-                {showLeaderboard ? '隐藏排行榜' : '显示排行榜'}
-            </button>
-
-            {showLeaderboard && (
-                <div style={{ marginTop: '1rem' }}>
-                <h3>排行榜（跳一跳）</h3>
-                <ol>
-                    {leaderboard.length === 0 ? (
-                    <p>暂无数据</p>
-                    ) : (
-                    leaderboard.map((entry, index) => (
-                        <li key={index}>
-                        {entry.nickname} - {entry.score}分
-                        </li>
-                    ))
-                    )}
-                </ol>
-                </div>
-            )}
-            </div>
 
         </div>
     );

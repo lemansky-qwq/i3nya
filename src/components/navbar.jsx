@@ -33,19 +33,6 @@ export default function Navbar() {
         <Link to="/">首页</Link>
         <Link to="/about">关于</Link>
         <Link to="/games">小游戏</Link>
-        {user && (
-          <Link to={`/user/${user.id}`}>我的主页</Link>
-        )}
-      </div>
-      <div className="navbar-right">
-        {!user ? (
-          <Link to="/login">登录 / 注册</Link>
-        ) : (
-          <>
-            <span>Hello，{nickname}</span>
-            <button onClick={handleLogout}>登出</button>
-          </>
-        )}
       </div>
     </nav>
   );
