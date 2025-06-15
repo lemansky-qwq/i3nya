@@ -86,10 +86,18 @@ export default function JumpGame() {
             // 成功跳到目标平台
             setPlayer({ x, y: 250 });
             setScore(prev => prev + 1);
+            // 根据得分增加难度
+            const difficultyScale = Math.min(score / 10, 1); // 0 到 1 之间
+            const minGap = 80 + difficultyScale * 40;        // 最小间距：80→120
+            const maxGap = 140 + difficultyScale * 60;       // 最大间距：140→200
+            const minWidth = 60 - difficultyScale * 20;      // 最小宽度：60→40
+            const maxWidth = 100 - difficultyScale * 30;     // 最大宽度：100→70
+
             const newPlatform = {
-                x: nextPlatform.x + 80 + Math.random() * 60,
-                width: 60 + Math.random() * 40,
+                x: nextPlatform.x + minGap + Math.random() * (maxGap - minGap),
+                width: minWidth + Math.random() * (maxWidth - minWidth),
             };
+
             setPlatforms([...platforms, newPlatform]);
         } else if (isOnCurrent) {
             // 跳回当前平台，存活但不加分
