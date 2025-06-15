@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../lib/AuthProvider';
 import { signOut, supabase } from '../lib/supabaseClient';
 import './Navbar.css';
 import { useEffect, useState } from 'react';
