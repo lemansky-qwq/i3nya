@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { signInWithEmail } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -40,7 +42,11 @@ export default function Login() {
           style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+        没有账号？<Link to="/signup">立即注册</Link>
+        </p>
         <button type="submit" style={{ width: '100%', padding: '0.5rem' }}>登录</button>
+
       </form>
     </div>
   );
