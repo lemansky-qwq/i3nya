@@ -35,27 +35,20 @@ const Game2048 = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      const key = e.key;
-      const keyMap = {
-        ArrowUp: 'ArrowUp',
-        ArrowDown: 'ArrowDown',
-        ArrowLeft: 'ArrowLeft',
-        ArrowRight: 'ArrowRight',
-        w: 'ArrowUp',
-        W: 'ArrowUp',
-        s: 'ArrowDown',
-        S: 'ArrowDown',
-        a: 'ArrowLeft',
-        A: 'ArrowLeft',
-        d: 'ArrowRight',
-        D: 'ArrowRight',
-      };
+  let key = e.key;
 
-      if (keyMap[key]) {
-        e.preventDefault();
-        handleMove(keyMap[key]);
-      }
-    };
+  // WASD 映射成 Arrow 键
+  if (key === 'w' || key === 'W') key = 'ArrowUp';
+  if (key === 'a' || key === 'A') key = 'ArrowLeft';
+  if (key === 's' || key === 'S') key = 'ArrowDown';
+  if (key === 'd' || key === 'D') key = 'ArrowRight';
+
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+    e.preventDefault();
+    handleMove(key);
+  }
+};
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [grid]);
