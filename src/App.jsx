@@ -6,6 +6,7 @@ import GameClick from './pages/gameclick';
 import NotFound from './pages/notfound';
 import Navbar from './components/navbar';
 import JumpGame from './pages/jump';
+import Game2048 from './pages/2048';
 
 
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/games/click" element={<GameClick />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/games/jump" element={<JumpGame />} />
+          <Route path="/games/2048" element={<Game2048 />} />
         </Routes>
       </div>
     </>
