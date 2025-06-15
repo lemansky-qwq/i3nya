@@ -43,7 +43,7 @@ export default function Navbar() {
           <Link to="/login">登录 / 注册</Link>
         ) : (
           <>
-            <span>Hello，{nickname || '用户'}</span>
+            <span>Hello，{nickname}</span>
             <button onClick={handleLogout}>登出</button>
           </>
         )}

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { getTopJumpScores } from '../lib/supabaseClient';
 
+
 export default function JumpLeaderboard() {
   const [scores, setScores] = useState([]);
 
