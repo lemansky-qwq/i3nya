@@ -14,6 +14,9 @@ export default function JumpGame() {
     const [charging, setCharging] = useState(false);
     const [chargeStart, setChargeStart] = useState(0);
     const [isJumping, setIsJumping] = useState(false);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const [leaderboard, setLeaderboard] = useState([]);
+
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -46,6 +49,31 @@ export default function JumpGame() {
 
         draw();
     }, [player, platforms, gameOver, score, highScore]);
+
+    const fetchLeaderboard = async () => {
+  const { data, error } = await supabase
+    .from('scores_jump')
+    .select('score, user_id')
+    .order('score', { ascending: false })
+    .limit(10);
+
+  if (error || !data) return;
+
+  // 获取昵称
+  const users = await Promise.all(data.map(async (entry) => {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('nickname')
+      .eq('id', entry.user_id)
+      .single();
+    return {
+      score: entry.score,
+      nickname: profile?.nickname || '未知',
+    };
+  }));
+
+  setLeaderboard(users);
+};
 
     const animateJump = (power) => {
         setIsJumping(true);
@@ -165,6 +193,32 @@ export default function JumpGame() {
                     {charging ? '蓄力中...' : '跳！'}
                 </button>
             )}
+            <div style={{ marginTop: '2rem' }}>
+            <button onClick={() => {
+                setShowLeaderboard(!showLeaderboard);
+                if (!showLeaderboard) fetchLeaderboard();
+            }}>
+                {showLeaderboard ? '隐藏排行榜' : '显示排行榜'}
+            </button>
+
+            {showLeaderboard && (
+                <div style={{ marginTop: '1rem' }}>
+                <h3>排行榜（跳一跳）</h3>
+                <ol>
+                    {leaderboard.length === 0 ? (
+                    <p>暂无数据</p>
+                    ) : (
+                    leaderboard.map((entry, index) => (
+                        <li key={index}>
+                        {entry.nickname} - {entry.score}分
+                        </li>
+                    ))
+                    )}
+                </ol>
+                </div>
+            )}
+            </div>
+
         </div>
     );
 }

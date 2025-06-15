@@ -1,21 +1,18 @@
-// src/components/Navbar.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthProvider';
-import { signOut } from '../lib/supabaseClient';
-import './Navbar.css'; // 导入样式文件
+import { signOut, supabase } from '../lib/supabaseClient';
+import './Navbar.css';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-
 
 export default function Navbar() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [nickname, setNickname] = useState('');
 
   const handleLogout = async () => {
     await signOut();
     navigate('/');
   };
-  const [nickname, setNickname] = useState('');
 
   useEffect(() => {
     const fetchNickname = async () => {
@@ -30,13 +27,15 @@ export default function Navbar() {
     fetchNickname();
   }, [user]);
 
-
   return (
     <nav className="navbar">
       <div className="navbar-left">
         <Link to="/">首页</Link>
         <Link to="/about">关于</Link>
         <Link to="/games">小游戏</Link>
+        {user && (
+          <Link to={`/user/${user.id}`}>我的主页</Link>
+        )}
       </div>
       <div className="navbar-right">
         {!user ? (
