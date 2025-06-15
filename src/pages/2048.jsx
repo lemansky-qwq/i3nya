@@ -93,16 +93,16 @@ const moveGrid = (grid, direction) => {
   };
 
   // 旋转处理
-  if (direction === 'ArrowUp') rotated = rotateLeft(clone);
-  if (direction === 'ArrowDown') rotated = rotateRight(clone);
-  if (direction === 'ArrowRight') rotated = rotate180(clone);
+  if (direction === 'ArrowLeft') rotated = rotateLeft(clone);
+  if (direction === 'ArrowRight') rotated = rotateRight(clone);
+  if (direction === 'ArrowDown') rotated = rotate180(clone);
 
   const moved = rotated.map(row => slideAndMerge(row));
 
   // 反向旋转回去
-  if (direction === 'ArrowUp') rotated = rotateRight(moved);
-  else if (direction === 'ArrowDown') rotated = rotateLeft(moved);
-  else if (direction === 'ArrowRight') rotated = rotate180(moved);
+  if (direction === 'ArrowLeft') rotated = rotateRight(moved);
+  else if (direction === 'ArrowRight') rotated = rotateLeft(moved);
+  else if (direction === 'ArrowDown') rotated = rotate180(moved);
   else rotated = moved; // ArrowLeft 无需旋转
 
   return [rotated, scoreGained];
