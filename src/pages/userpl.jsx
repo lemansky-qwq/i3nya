@@ -1,58 +1,57 @@
-// src/pages/UserProfile.jsx
 import { useEffect, useState } from 'react';
-import { useAuth } from '../lib/AuthProvider';
+import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
 
-export default function UserProfile() {
-  const { user, loading } = useAuth();
+export default function UserPublicProfile() {
+  const { uid } = useParams();
   const [nickname, setNickname] = useState('');
   const [scores, setScores] = useState([]);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!loading && !user) navigate('/login');
-  }, [loading, user, navigate]);
+    async function fetchUserData() {
+      if (!uid) return;
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!user) return;
-
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('user_profiles')
         .select('nickname')
-        .eq('id', user.id)
+        .eq('id', uid)
         .single();
 
-      const { data: scores } = await supabase
+      if (profileError || !profile) {
+        setError('找不到该用户');
+        return;
+      }
+
+      setNickname(profile.nickname);
+
+      const { data: jumpScores } = await supabase
         .from('scores_jump')
         .select('score, created_at')
-        .eq('user_id', user.id)
+        .eq('user_id', uid)
         .order('score', { ascending: false });
 
-      if (profile) setNickname(profile.nickname);
-      if (scores) setScores(scores);
+      setScores(jumpScores || []);
     }
 
-    fetchData();
-  }, [user]);
+    fetchUserData();
+  }, [uid]);
 
-  if (!user) return null;
+  if (error) return <p style={{ textAlign: 'center', color: 'red' }}>{error}</p>;
 
   return (
     <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
-      <h2>用户资料</h2>
-      <p><strong>UID：</strong> {user.id}</p>
-      <p><strong>邮箱：</strong> {user.email}</p>
-      <p><strong>用户名：</strong> {nickname || '未设置'}</p>
+      <h2>用户主页</h2>
+      <p><strong>UID：</strong> {uid}</p>
+      <p><strong>昵称：</strong> {nickname}</p>
 
-      <h3 style={{ marginTop: '2rem' }}>🎮 我的跳一跳成绩</h3>
+      <h3 style={{ marginTop: '2rem' }}>跳一跳成绩</h3>
       <ul>
         {scores.length === 0 ? (
           <li>暂无成绩</li>
         ) : (
-          scores.map((s, idx) => (
-            <li key={idx}>得分：{s.score}（{new Date(s.created_at).toLocaleString()}）</li>
+          scores.map((s, i) => (
+            <li key={i}>得分：{s.score}（{new Date(s.created_at).toLocaleString()}）</li>
           ))
         )}
       </ul>

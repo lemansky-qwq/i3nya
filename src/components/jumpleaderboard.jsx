@@ -1,4 +1,5 @@
 // src/components/JumpLeaderboard.jsx
+
 import { useEffect, useState } from 'react';
 import { getTopJumpScores } from '../lib/supabaseClient';
 
@@ -6,15 +7,18 @@ import { getTopJumpScores } from '../lib/supabaseClient';
 export default function JumpLeaderboard() {
   const [scores, setScores] = useState([]);
 
+
   useEffect(() => {
-  async function fetchScores() {
-    const { data, error } = await getTopJumpScores();
-    console.log('🏆 排行榜数据', data);
-    if (error) console.error('排行榜错误', error.message);
-    setScores(data || []);
-  }
-  fetchScores();
-}, []);
+    console.log('排行榜加载了');
+    async function fetchScores() {
+      const { data, error } = await getTopJumpScores();
+      console.log('排行榜数据', data);
+      if (error) console.error('查询失败：', error.message);
+      setScores(data || []);
+    }
+    fetchScores();
+  }, []);
+
 
 
   return (
@@ -30,7 +34,7 @@ export default function JumpLeaderboard() {
         <tbody>
           {scores.map((item, index) => (
             <tr key={index}>
-              <td>{item.user?.nickname || '匿名用户'}</td>
+              <td>{item.user_profiles?.nickname || '匿名'}</td>
               <td style={{ textAlign: 'right' }}>{item.score}</td>
             </tr>
           ))}

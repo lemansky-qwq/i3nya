@@ -27,7 +27,7 @@ export default function App() {
           <Route path="/games/jump" element={<JumpGame />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/userpl" element={<Userpl />} />
+          <Route path="/userpl/:uid" element={<Userpl />} />
         </Routes>
       </div>
     </>
