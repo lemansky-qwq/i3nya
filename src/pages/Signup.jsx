@@ -8,22 +8,40 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [nickname, setNickname] = useState('');
+
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    const { error } = await signUpWithEmail(email, password);
+    const { data, error } = await signUpWithEmail(email, password);
     if (error) {
-      setError(error.message);
+    setError(error.message);
     } else {
-      alert('注册成功，请检查邮箱验证（如启用）');
-      navigate('/login');
+    const user = data.user;
+    // 写入 nickname 到数据库
+    await supabase.from('user_profiles').insert({
+        id: user.id,
+        nickname: nickname
+    });
+    alert('注册成功！');
+    navigate('/login');
     }
+
   };
 
   return (
     <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
       <h2>注册账号</h2>
       <form onSubmit={handleSignup}>
+            <input
+            type="text"
+            placeholder="用户名"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            required
+            style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+
         <input
           type="email"
           placeholder="邮箱"

@@ -14,15 +14,24 @@ export default function JumpLeaderboard() {
   }, []);
 
   return (
-    <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
+    <div style={{ maxWidth: '480px', margin: '2rem auto' }}>
       <h3>全球排行榜（跳一跳）</h3>
-      <ol>
-        {scores.map((item, index) => (
-          <li key={index}>
-            ID: {item.user_id?.slice(0, 6)}... | 分数：{item.score}
-          </li>
-        ))}
-      </ol>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr style={{ borderBottom: '1px solid #ccc' }}>
+            <th style={{ textAlign: 'left' }}>昵称</th>
+            <th style={{ textAlign: 'right' }}>分数</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scores.map((item, index) => (
+            <tr key={index}>
+              <td>{item.user?.nickname || '匿名用户'}</td>
+              <td style={{ textAlign: 'right' }}>{item.score}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -2,6 +2,10 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/AuthProvider';
 import { signOut } from '../lib/supabaseClient';
+import './Navbar.css'; // 导入样式文件
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
+
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -11,23 +15,39 @@ export default function Navbar() {
     await signOut();
     navigate('/');
   };
+  const [nickname, setNickname] = useState('');
+
+  useEffect(() => {
+    const fetchNickname = async () => {
+      if (!user) return;
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('nickname')
+        .eq('id', user.id)
+        .single();
+      if (data) setNickname(data.nickname);
+    };
+    fetchNickname();
+  }, [user]);
+
 
   return (
-    <nav style={{ padding: '1rem', borderBottom: '1px solid #ccc' }}>
-      <Link to="/" style={{ marginRight: '1rem' }}>首页</Link>
-      <Link to="/about" style={{ marginRight: '1rem' }}>关于</Link>
-      <Link to="/games" style={{ marginRight: '1rem' }}>小游戏</Link>
-
-      <span style={{ float: 'right' }}>
+    <nav className="navbar">
+      <div className="navbar-left">
+        <Link to="/">首页</Link>
+        <Link to="/about">关于</Link>
+        <Link to="/games">小游戏</Link>
+      </div>
+      <div className="navbar-right">
         {!user ? (
-          <Link to="/login">登录</Link>
+          <Link to="/login">登录 / 注册</Link>
         ) : (
           <>
-            👋 欢迎，{user.email.split('@')[0]} &nbsp;
+            <span>👋 {nickname || '用户'}</span>
             <button onClick={handleLogout}>登出</button>
           </>
         )}
-      </span>
+      </div>
     </nav>
   );
 }
