@@ -67,24 +67,20 @@ const Game2048 = () => {
     }
   };
 
-  const moveGrid = (grid, direction) => {
-  const transpose = (matrix) =>
-    matrix[0].map((_, i) => matrix.map(row => row[i]));
-  const reverseRows = (matrix) =>
-    matrix.map(row => [...row].reverse());
-
-  let workingGrid = [...grid];
+const moveGrid = (grid, direction) => {
+  const clone = grid.map(row => [...row]);
+  let rotated = clone;
   let scoreGained = 0;
 
-  if (direction === 'ArrowUp') {
-    workingGrid = transpose(workingGrid);
-  } else if (direction === 'ArrowDown') {
-    workingGrid = reverseRows(transpose(workingGrid));
-  } else if (direction === 'ArrowRight') {
-    workingGrid = reverseRows(workingGrid);
-  }
+  const rotateRight = (matrix) =>
+    matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
 
-  const mergedGrid = workingGrid.map(row => {
+  const rotateLeft = (matrix) =>
+    matrix[0].map((_, i) => matrix.map(row => row[row.length - 1 - i]));
+
+  const rotate180 = (matrix) => rotateLeft(rotateLeft(matrix));
+
+  const slideAndMerge = (row) => {
     const newRow = row.filter(val => val !== 0);
     for (let i = 0; i < newRow.length - 1; i++) {
       if (newRow[i] === newRow[i + 1]) {
@@ -93,23 +89,25 @@ const Game2048 = () => {
         newRow[i + 1] = 0;
       }
     }
-    const finalRow = newRow.filter(val => val !== 0);
-    while (finalRow.length < 4) finalRow.push(0);
-    return finalRow;
-  });
+    return newRow.filter(val => val !== 0).concat(Array(4 - newRow.filter(val => val !== 0).length).fill(0));
+  };
 
-  let finalGrid = mergedGrid;
+  // 旋转处理
+  if (direction === 'ArrowUp') rotated = rotateLeft(clone);
+  if (direction === 'ArrowDown') rotated = rotateRight(clone);
+  if (direction === 'ArrowRight') rotated = rotate180(clone);
 
-  if (direction === 'ArrowRight') {
-    finalGrid = reverseRows(finalGrid);
-  } else if (direction === 'ArrowDown') {
-    finalGrid = transpose(reverseRows(finalGrid));
-  } else if (direction === 'ArrowUp') {
-    finalGrid = transpose(finalGrid);
-  }
+  const moved = rotated.map(row => slideAndMerge(row));
 
-  return [finalGrid, scoreGained];
+  // 反向旋转回去
+  if (direction === 'ArrowUp') rotated = rotateRight(moved);
+  else if (direction === 'ArrowDown') rotated = rotateLeft(moved);
+  else if (direction === 'ArrowRight') rotated = rotate180(moved);
+  else rotated = moved; // ArrowLeft 无需旋转
+
+  return [rotated, scoreGained];
 };
+
 
 
   const resetGame = () => {
