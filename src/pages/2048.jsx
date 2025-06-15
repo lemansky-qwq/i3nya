@@ -35,9 +35,25 @@ const Game2048 = () => {
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      const key = e.key;
+      const keyMap = {
+        ArrowUp: 'ArrowUp',
+        ArrowDown: 'ArrowDown',
+        ArrowLeft: 'ArrowLeft',
+        ArrowRight: 'ArrowRight',
+        w: 'ArrowUp',
+        W: 'ArrowUp',
+        s: 'ArrowDown',
+        S: 'ArrowDown',
+        a: 'ArrowLeft',
+        A: 'ArrowLeft',
+        d: 'ArrowRight',
+        D: 'ArrowRight',
+      };
+
+      if (keyMap[key]) {
         e.preventDefault();
-        handleMove(e.key);
+        handleMove(keyMap[key]);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -62,18 +78,21 @@ const Game2048 = () => {
     const newGrid = grid.map(row => [...row]);
     let scoreGained = 0;
 
-    const rotateGrid = (grid) => {
-      return grid[0].map((_, i) => grid.map(row => row[i])).reverse();
-    };
+    const rotateRight = (matrix) =>
+      matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
 
-    const rotateBack = (grid) => {
-      return grid[0].map((_, i) => grid.map(row => row[i])).reverse().reverse();
-    };
+    const rotateLeft = (matrix) =>
+      matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
 
     let workingGrid = [...newGrid];
-    if (direction === 'ArrowUp') workingGrid = rotateGrid(workingGrid);
-    if (direction === 'ArrowDown') workingGrid = rotateGrid(rotateGrid(rotateGrid(workingGrid)));
-    if (direction === 'ArrowRight') workingGrid = workingGrid.map(row => row.reverse());
+
+    if (direction === 'ArrowUp') {
+      workingGrid = rotateLeft(workingGrid);
+    } else if (direction === 'ArrowDown') {
+      workingGrid = rotateRight(workingGrid);
+    } else if (direction === 'ArrowRight') {
+      workingGrid = workingGrid.map(row => row.reverse());
+    }
 
     const mergedGrid = workingGrid.map(row => {
       const newRow = row.filter(val => val !== 0);
@@ -84,14 +103,22 @@ const Game2048 = () => {
           newRow[i + 1] = 0;
         }
       }
-      return newRow.filter(val => val !== 0).concat(Array(4 - newRow.filter(val => val !== 0).length).fill(0));
+      const finalRow = newRow.filter(val => val !== 0);
+      while (finalRow.length < 4) finalRow.push(0);
+      return finalRow;
     });
 
-    if (direction === 'ArrowRight') mergedGrid.forEach(row => row.reverse());
-    if (direction === 'ArrowDown') mergedGrid = rotateGrid(mergedGrid);
-    if (direction === 'ArrowUp') mergedGrid = rotateGrid(rotateGrid(rotateGrid(mergedGrid)));
+    let finalGrid = mergedGrid;
 
-    return [mergedGrid, scoreGained];
+    if (direction === 'ArrowRight') {
+      finalGrid = finalGrid.map(row => row.reverse());
+    } else if (direction === 'ArrowDown') {
+      finalGrid = rotateLeft(finalGrid);
+    } else if (direction === 'ArrowUp') {
+      finalGrid = rotateRight(finalGrid);
+    }
+
+    return [finalGrid, scoreGained];
   };
 
   const resetGame = () => {
@@ -105,6 +132,7 @@ const Game2048 = () => {
     <div className="game-container">
       <h1>2048</h1>
       <p>分数：{score}　最高分：{highScore}</p>
+      <p>使用 ↑ ↓ ← → 或 W A S D 键移动</p>
       <div className="grid">
         {grid.map((row, i) =>
           <div className="row" key={i}>
