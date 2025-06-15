@@ -1,45 +1,76 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #faf8ef;
+.game-container {
   text-align: center;
-  margin: 0;
+  font-family: sans-serif;
+  margin-top: 40px;
 }
 
-.container {
-  padding: 2rem;
-}
-
-.board {
+.grid {
   display: grid;
-  grid-template-columns: repeat(4, 80px);
+  grid-template-columns: repeat(4, 70px);
   grid-gap: 10px;
-  justify-content: center;
-  margin: 20px auto;
+  background: #bbada0;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 0 auto;
 }
 
 .cell {
-  width: 80px;
-  height: 80px;
-  line-height: 80px;
+  width: 70px;
+  height: 70px;
   background: #cdc1b4;
-  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: bold;
-  border-radius: 5px;
-}
-
-.score {
   font-size: 20px;
-  margin-bottom: 10px;
+  border-radius: 5px;
+  color: #776e65;
+  transition: all 0.1s ease-in-out;
 }
 
-.value-2    { background: #eee4da; }
-.value-4    { background: #ede0c8; }
-.value-8    { background: #f2b179; color: #fff; }
-.value-16   { background: #f59563; color: #fff; }
-.value-32   { background: #f67c5f; color: #fff; }
-.value-64   { background: #f65e3b; color: #fff; }
-.value-128  { background: #edcf72; color: #fff; }
-.value-256  { background: #edcc61; color: #fff; }
-.value-512  { background: #edc850; color: #fff; }
-.value-1024 { background: #edc53f; color: #fff; }
-.value-2048 { background: #edc22e; color: #fff; }
+.value-0 {
+  background: #ccc0b3;
+  color: transparent;
+}
+.value-2 {
+  background: #eee4da;
+}
+.value-4 {
+  background: #ede0c8;
+}
+.value-8 {
+  background: #f2b179;
+  color: #fff;
+}
+.value-16 {
+  background: #f59563;
+  color: #fff;
+}
+.value-32 {
+  background: #f67c5f;
+  color: #fff;
+}
+.value-64 {
+  background: #f65e3b;
+  color: #fff;
+}
+.value-128 {
+  background: #edcf72;
+  color: #fff;
+}
+.value-256 {
+  background: #edcc61;
+  color: #fff;
+}
+.value-512 {
+  background: #edc850;
+  color: #fff;
+}
+.value-1024 {
+  background: #edc53f;
+  color: #fff;
+}
+.value-2048 {
+  background: #edc22e;
+  color: #fff;
+}
