@@ -6,12 +6,15 @@ export default function JumpLeaderboard() {
   const [scores, setScores] = useState([]);
 
   useEffect(() => {
-    async function fetchScores() {
-      const { data, error } = await getTopJumpScores();
-      if (!error && data) setScores(data);
-    }
-    fetchScores();
-  }, []);
+  async function fetchScores() {
+    const { data, error } = await getTopJumpScores();
+    console.log('🏆 排行榜数据', data);
+    if (error) console.error('排行榜错误', error.message);
+    setScores(data || []);
+  }
+  fetchScores();
+}, []);
+
 
   return (
     <div style={{ maxWidth: '480px', margin: '2rem auto' }}>

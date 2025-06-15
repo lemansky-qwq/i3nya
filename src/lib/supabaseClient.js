@@ -42,8 +42,10 @@ export async function uploadJumpScore(score) {
 export async function getTopJumpScores(limit = 10) {
   const { data, error } = await supabase
     .from('scores_jump')
-    .select('score, created_at, user_id')
+    .select('score, created_at, user_id, user:user_profiles(nickname)')
     .order('score', { ascending: false })
     .limit(limit);
+
   return { data, error };
 }
+

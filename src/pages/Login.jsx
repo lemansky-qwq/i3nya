@@ -67,6 +67,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
         <input
           type="password"

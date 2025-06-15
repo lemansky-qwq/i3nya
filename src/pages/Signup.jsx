@@ -13,6 +13,16 @@ export default function Signup() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    const { data: existing, error: checkError } = await supabase
+    .from('user_profiles')
+    .select('id')
+    .eq('nickname', nickname)
+    .single();
+
+    if (existing) {
+    setError('昵称已被占用，请换一个');
+    return;
+    }
     const { data, error } = await signUpWithEmail(email, password);
     if (error) {
     setError(error.message);
