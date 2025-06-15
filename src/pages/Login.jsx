@@ -12,26 +12,61 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    const { error } = await signInWithEmail(email, password);
-    if (error) {
-      setError(error.message);
-    } else {
-      navigate('/dashboard');
+  e.preventDefault();
+
+  let loginEmail = email;
+
+  // 如果输入看起来不是邮箱 → 当作 nickname
+  if (!email.includes('@')) {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('nickname', email)
+      .single();
+
+    if (!data || error) {
+      setError('找不到该用户名');
+      return;
     }
-  };
+
+    const userId = data.id;
+
+    // 查 auth.users 表，拿到邮箱
+    const { data: userData, error: userError } = await supabase
+      .from('auth.users')
+      .select('email')
+      .eq('id', userId)
+      .single();
+
+    if (!userData || userError) {
+      setError('账号信息错误');
+      return;
+    }
+
+    loginEmail = userData.email;
+  }
+
+  // 然后用 email + password 登录
+  const { error: loginError } = await signInWithEmail(loginEmail, password);
+
+  if (loginError) {
+    setError('登录失败：' + loginError.message);
+  } else {
+    navigate('/profile');
+  }
+};
+
 
   return (
     <div style={{ maxWidth: '400px', margin: '2rem auto' }}>
       <h2>登录</h2>
       <form onSubmit={handleLogin}>
         <input
-          type="email"
-          placeholder="邮箱"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+            type="text"
+            placeholder="用户名或邮箱"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
         />
         <input
           type="password"

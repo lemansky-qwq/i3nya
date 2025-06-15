@@ -8,6 +8,7 @@ import Navbar from './components/navbar';
 import JumpGame from './pages/jump';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Userpl from './pages/userpl';
 
 
 
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/games/jump" element={<JumpGame />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/userpl" element={<Userpl />} />
         </Routes>
       </div>
     </>
