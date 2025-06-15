@@ -75,51 +75,49 @@ const Game2048 = () => {
   };
 
   const moveGrid = (grid, direction) => {
-    const newGrid = grid.map(row => [...row]);
-    let scoreGained = 0;
+  const transpose = (matrix) =>
+    matrix[0].map((_, i) => matrix.map(row => row[i]));
+  const reverseRows = (matrix) =>
+    matrix.map(row => [...row].reverse());
 
-    const rotateRight = (matrix) =>
-      matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
+  let workingGrid = [...grid];
+  let scoreGained = 0;
 
-    const rotateLeft = (matrix) =>
-      matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
+  if (direction === 'ArrowUp') {
+    workingGrid = transpose(workingGrid);
+  } else if (direction === 'ArrowDown') {
+    workingGrid = reverseRows(transpose(workingGrid));
+  } else if (direction === 'ArrowRight') {
+    workingGrid = reverseRows(workingGrid);
+  }
 
-    let workingGrid = [...newGrid];
-
-    if (direction === 'ArrowUp') {
-      workingGrid = rotateLeft(workingGrid);
-    } else if (direction === 'ArrowDown') {
-      workingGrid = rotateRight(workingGrid);
-    } else if (direction === 'ArrowRight') {
-      workingGrid = workingGrid.map(row => row.reverse());
-    }
-
-    const mergedGrid = workingGrid.map(row => {
-      const newRow = row.filter(val => val !== 0);
-      for (let i = 0; i < newRow.length - 1; i++) {
-        if (newRow[i] === newRow[i + 1]) {
-          newRow[i] *= 2;
-          scoreGained += newRow[i];
-          newRow[i + 1] = 0;
-        }
+  const mergedGrid = workingGrid.map(row => {
+    const newRow = row.filter(val => val !== 0);
+    for (let i = 0; i < newRow.length - 1; i++) {
+      if (newRow[i] === newRow[i + 1]) {
+        newRow[i] *= 2;
+        scoreGained += newRow[i];
+        newRow[i + 1] = 0;
       }
-      const finalRow = newRow.filter(val => val !== 0);
-      while (finalRow.length < 4) finalRow.push(0);
-      return finalRow;
-    });
-
-    let finalGrid = mergedGrid;
-
-    if (direction === 'ArrowRight') {
-      finalGrid = finalGrid.map(row => row.reverse());
-    } else if (direction === 'ArrowDown') {
-      finalGrid = rotateLeft(finalGrid);
-    } else if (direction === 'ArrowUp') {
-      finalGrid = rotateRight(finalGrid);
     }
+    const finalRow = newRow.filter(val => val !== 0);
+    while (finalRow.length < 4) finalRow.push(0);
+    return finalRow;
+  });
 
-    return [finalGrid, scoreGained];
-  };
+  let finalGrid = mergedGrid;
+
+  if (direction === 'ArrowRight') {
+    finalGrid = reverseRows(finalGrid);
+  } else if (direction === 'ArrowDown') {
+    finalGrid = transpose(reverseRows(finalGrid));
+  } else if (direction === 'ArrowUp') {
+    finalGrid = transpose(finalGrid);
+  }
+
+  return [finalGrid, scoreGained];
+};
+
 
   const resetGame = () => {
     const empty = generateEmptyGrid();
