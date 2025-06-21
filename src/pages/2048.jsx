@@ -33,25 +33,53 @@ const Game2048 = () => {
     return parseInt(localStorage.getItem('highScore')) || 0;
   });
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-  let key = e.key;
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    let key = e.key;
+    if (key === 'w' || key === 'W') key = 'ArrowUp';
+    if (key === 'a' || key === 'A') key = 'ArrowLeft';
+    if (key === 's' || key === 'S') key = 'ArrowDown';
+    if (key === 'd' || key === 'D') key = 'ArrowRight';
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+      e.preventDefault();
+      handleMove(key);
+    }
+  };
 
-  // WASD 映射成 Arrow 键
-  if (key === 'w' || key === 'W') key = 'ArrowUp';
-  if (key === 'a' || key === 'A') key = 'ArrowLeft';
-  if (key === 's' || key === 'S') key = 'ArrowDown';
-  if (key === 'd' || key === 'D') key = 'ArrowRight';
+  let touchStartX = 0;
+  let touchStartY = 0;
 
-  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-    e.preventDefault();
-    handleMove(key);
-  }
-};
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+  };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [grid]);
+  const handleTouchEnd = (e) => {
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 30) handleMove('ArrowRight');
+      else if (dx < -30) handleMove('ArrowLeft');
+    } else {
+      if (dy > 30) handleMove('ArrowDown');
+      else if (dy < -30) handleMove('ArrowUp');
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('touchstart', handleTouchStart);
+  window.addEventListener('touchend', handleTouchEnd);
+
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+    window.removeEventListener('touchstart', handleTouchStart);
+    window.removeEventListener('touchend', handleTouchEnd);
+  };
+}, [grid]);
+
 
   const handleMove = (direction) => {
     const [newGrid, gained] = moveGrid(grid, direction);
