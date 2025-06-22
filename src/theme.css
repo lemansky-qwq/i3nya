@@ -1,0 +1,103 @@
+/* 默认基础样式 */
+body {
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: white;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+/* 右侧切换栏样式 */
+.theme-sidebar {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background-color: #333;
+  width: 200px;
+  padding: 20px;
+  border-radius: 10px 0 0 10px;
+  box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.theme-sidebar.open {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.theme-toggle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.theme-toggle-button:hover {
+  background-color: #0056b3;
+}
+
+/* 主题样式 */
+.theme-light {
+  background-color: white;
+  color: black;
+}
+
+.theme-dark {
+  background-color: #121212;
+  color: white;
+}
+
+.theme-spring {
+  background-color: #FFCCCB; /* 淡粉色 */
+  color: #333;
+}
+
+.theme-summer {
+  background-color: #87CEEB; /* 明亮蓝色 */
+  color: #333;
+}
+
+.theme-autumn {
+  background-color: #FF8C00; /* 橙色 */
+  color: #fff;
+}
+
+.theme-winter {
+  background-color: #ADD8E6; /* 冷色调 */
+  color: #333;
+}
+
+.theme-nightmare {
+  background-color: #000;
+  color: red;
+}

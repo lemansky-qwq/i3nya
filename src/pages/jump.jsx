@@ -139,7 +139,7 @@ export default function JumpGame() {
 
     return (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <h1>跳一跳！Jump 1 Jump 3.3</h1>
+            <h1>跳一跳！Jump 1 Jump 3.4</h1>
             <canvas ref={canvasRef} style={{ border: '1px solid #ccc' }}></canvas>
             <p>得分：{score} | 最高分：{highScore}</p>
 

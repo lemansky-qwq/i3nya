@@ -108,7 +108,7 @@ const Game2048 = () => {
         ) : (
           <ul>
             {historyScores.map((score, index) => (
-              <li key={index}>第 {index + 1} 局：{score} 分</li>
+              <li key={index}>第 {index + 1} 名：{score} 分</li>
             ))}
           </ul>
         )}
