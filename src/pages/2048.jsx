@@ -33,54 +33,7 @@ const Game2048 = () => {
     return parseInt(localStorage.getItem('highScore')) || 0;
   });
 
-useEffect(() => {
-  const handleKeyDown = (e) => {
-    let key = e.key;
-    if (key === 'w' || key === 'W') key = 'ArrowUp';
-    if (key === 'a' || key === 'A') key = 'ArrowLeft';
-    if (key === 's' || key === 'S') key = 'ArrowDown';
-    if (key === 'd' || key === 'D') key = 'ArrowRight';
-    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-      e.preventDefault();
-      handleMove(key);
-    }
-  };
-
-  let touchStartX = 0;
-  let touchStartY = 0;
-
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    const touch = e.changedTouches[0];
-    const dx = touch.clientX - touchStartX;
-    const dy = touch.clientY - touchStartY;
-
-    if (Math.abs(dx) > Math.abs(dy)) {
-      if (dx > 30) handleMove('ArrowRight');
-      else if (dx < -30) handleMove('ArrowLeft');
-    } else {
-      if (dy > 30) handleMove('ArrowDown');
-      else if (dy < -30) handleMove('ArrowUp');
-    }
-  };
-
-  window.addEventListener('keydown', handleKeyDown);
-  window.addEventListener('touchstart', handleTouchStart);
-  window.addEventListener('touchend', handleTouchEnd);
-
-  return () => {
-    window.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('touchstart', handleTouchStart);
-    window.removeEventListener('touchend', handleTouchEnd);
-  };
-}, [grid]);
-
-
+  // 用来处理用户的点击方向按钮操作
   const handleMove = (direction) => {
     const [newGrid, gained] = moveGrid(grid, direction);
     if (JSON.stringify(newGrid) !== JSON.stringify(grid)) {
@@ -95,6 +48,47 @@ useEffect(() => {
     }
   };
 
+  // 游戏重开
+  const resetGame = () => {
+    const empty = generateEmptyGrid();
+    const startGrid = addRandomNumber(addRandomNumber(empty));
+    setGrid(startGrid);
+    setScore(0);
+  };
+
+  return (
+    <div className="game-container">
+      <h1>2048</h1>
+      <p>分数：{score}　最高分：{highScore}</p>
+      <p>点击按钮进行操作</p>
+      <div className="grid">
+        {grid.map((row, i) =>
+          <div className="row" key={i}>
+            {row.map((cell, j) =>
+              <div className={`cell value-${cell}`} key={j}>
+                {cell !== 0 ? cell : ''}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+      
+      {/* 操作按钮 */}
+      <div className="buttons-container">
+        <button className="move-button" onClick={() => handleMove('ArrowUp')}>↑</button>
+        <div className="row-buttons">
+          <button className="move-button" onClick={() => handleMove('ArrowLeft')}>←</button>
+          <button className="move-button" onClick={() => handleMove('ArrowRight')}>→</button>
+        </div>
+        <button className="move-button" onClick={() => handleMove('ArrowDown')}>↓</button>
+      </div>
+      
+      <button onClick={resetGame}>重开一局</button>
+    </div>
+  );
+};
+
+// 移动的逻辑
 const moveGrid = (grid, direction) => {
   const clone = grid.map(row => [...row]);
   let rotated = clone;
@@ -134,36 +128,6 @@ const moveGrid = (grid, direction) => {
   else rotated = moved; // ArrowLeft 无需旋转
 
   return [rotated, scoreGained];
-};
-
-
-
-  const resetGame = () => {
-    const empty = generateEmptyGrid();
-    const startGrid = addRandomNumber(addRandomNumber(empty));
-    setGrid(startGrid);
-    setScore(0);
-  };
-
-  return (
-    <div className="game-container">
-      <h1>2048</h1>
-      <p>分数：{score}　最高分：{highScore}</p>
-      <p>使用 ↑ ↓ ← → 或 W A S D 键移动</p>
-      <div className="grid">
-        {grid.map((row, i) =>
-          <div className="row" key={i}>
-            {row.map((cell, j) =>
-              <div className={`cell value-${cell}`} key={j}>
-                {cell !== 0 ? cell : ''}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-      <button onClick={resetGame}>重开一局</button>
-    </div>
-  );
 };
 
 export default Game2048;
