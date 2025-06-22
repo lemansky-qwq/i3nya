@@ -4,38 +4,68 @@ import { supabase } from '../lib/supabaseClient';
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [nickname, setUsername] = useState('');
+  const [nickname, setNickname] = useState('');
   const [message, setMessage] = useState('');
 
   const handleRegister = async (e) => {
-    e.preventDefault();
-    setMessage('');
+  e.preventDefault();
+  setMessage('');
+  console.log('开始注册', { email, password, nickname });
 
-    // 先注册账户
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+  // 1. 注册用户
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
-    if (error) {
-      setMessage(error.message);
-      return;
+  console.log('注册响应:', { data, error });
+
+  if (error) {
+    console.error('注册错误:', error);
+    setMessage(error.message);
+    return;
+  }
+
+  // 2. 获取用户ID
+  const userId = data.user?.id;
+  console.log('用户ID:', userId);
+  
+  if (!userId) {
+    setMessage('注册成功，但无法获取用户ID');
+    return;
+  }
+
+  // 3. 插入profile
+  console.log('准备插入profile:', { user_uuid: userId, nickname });
+  
+  const insertResponse = await supabase
+    .from('profiles')
+    .insert([{ 
+      user_uuid: userId, 
+      nickname 
+    }]);
+  
+  console.log('插入响应:', insertResponse);
+
+  if (insertResponse.error) {
+    console.error('插入profile失败:', insertResponse.error);
+    // 尝试获取更详细的错误信息
+    if (insertResponse.error.details) {
+      console.error('错误详情:', insertResponse.error.details);
     }
-
-    // 注册成功后，写入 profiles 表
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ id: data.user.id, nickname }]);
-
-      if (profileError) {
-        setMessage('注册成功，但写入用户名失败: ' + profileError.message);
-        return;
-      }
-
-      setMessage('注册成功，请检查邮箱以完成验证');
+    if (insertResponse.error.hint) {
+      console.error('错误提示:', insertResponse.error.hint);
     }
-  };
+    
+    // 4. 回滚：删除用户
+    const deleteResponse = await supabase.auth.admin.deleteUser(userId);
+    console.log('删除用户响应:', deleteResponse);
+    
+    setMessage(`注册失败: ${insertResponse.error.message}`);
+  } else {
+    setMessage('注册成功！请检查邮箱验证');
+  }
+};
 
   return (
     <div>
@@ -45,7 +75,7 @@ export default function Register() {
           type="text"
           placeholder="用户名"
           value={nickname}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setNickname(e.target.value)}
           required
         />
         <input

@@ -32,7 +32,13 @@ export default function Login() {
     .select('id')
     .eq('user_uuid', data.user.id)
     .single();
+    // 登录成功后
+if (!profile) {
+  await supabase.from('profiles').insert([{ user_uuid: user.id, nickname: '未命名' }]);
+}
+
   setMessage('登录成功！');
+  
   navigate(`/profile/${profile.id}`);
 };
 
