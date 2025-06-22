@@ -2,4 +2,3 @@ node_modules/
 dist/ 
 node_cache/ 
 .env
-src/lib/supabaseClient.js
