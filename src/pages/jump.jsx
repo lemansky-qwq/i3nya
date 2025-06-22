@@ -17,11 +17,19 @@ export default function JumpGame() {
     
 function getTextColorByTheme() {
   const bodyClassList = document.body.classList;
-  if (bodyClassList.contains('theme-light') || bodyClassList.contains('theme-spring')) {
-    return '#333';
+
+  if (bodyClassList.contains('theme-light') || bodyClassList.contains('theme-spring') || bodyClassList.contains('theme-winter')) {
+    return '#333'; // 浅色背景用深色文字
+  } 
+
+  if (bodyClassList.contains('theme-nightmare')) {
+    return '#ff0000'; // 噩梦主题红色文字
   }
+
+  // 其余深色背景用白色文字
   return '#eee';
 }
+
 
     useEffect(() => {
         const canvas = canvasRef.current;

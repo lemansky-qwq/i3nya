@@ -24,13 +24,13 @@ body {
 
 /* 夏季主题 - 深绿色背景，米白文字 */
 .theme-summer {
-  background-color: #006a00; /* 深绿 */
+  background-color: #143714; /* 深绿 */
   color: #f0f0e8; /* 浅米白 */
 }
 
 /* 秋季主题 - 橙棕背景，浅米色文字 */
 .theme-autumn {
-  background-color: #ab4400; /* 橙棕 */
+  background-color: #572301; /* 橙棕 */
   color: #fff3e0; /* 浅米色 */
 }
 
