@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient'; // 你的 supabase 客户端路径
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabaseClient';
 import './navbar.css';
 
 export default function Navbar({ handleChangeTheme, user }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profileId, setProfileId] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    async function fetchProfileId() {
+      if (!user) {
+        setProfileId(null);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_uuid', user.id)  // 这里根据你的 profiles 表字段名调整
+        .single();
+      if (error) {
+        console.error('获取profile id失败', error);
+        setProfileId(null);
+      } else {
+        setProfileId(data.id);
+      }
+    }
+    fetchProfileId();
+  }, [user]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -12,6 +35,7 @@ export default function Navbar({ handleChangeTheme, user }) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    navigate('/login');
   };
 
   return (
@@ -19,12 +43,16 @@ export default function Navbar({ handleChangeTheme, user }) {
       <div className="navbar-left">
         <Link to="/">首页</Link>
         <Link to="/about">关于</Link>
-        <Link to="/games/games">小游戏</Link>
+        <Link to="/games">小游戏</Link>
       </div>
       <div className="navbar-right">
         {user ? (
           <>
-            <Link to={`/profile/${user.id}`} className="nav-button">我的主页</Link>
+            {profileId ? (
+              <Link to={`/profile/${profileId}`} className="nav-button">我的主页</Link>
+            ) : (
+              <span className="nav-button">加载中...</span>
+            )}
             <button className="nav-button" onClick={handleLogout}>登出</button>
           </>
         ) : (

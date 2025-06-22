@@ -1,28 +1,42 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setMessage('');
+  e.preventDefault();
+  setMessage('');
+  setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    if (error) {
-      setMessage(error.message);
-    } else {
-      setMessage('登录成功！');
-      // 登录成功，跳转主页
-      window.location.href = '/';
-    }
-  };
+  setLoading(false);
+
+  if (error) {
+    setMessage(error.message);
+    return;
+  }
+
+  // 登录成功后查询数字 ID
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_uuid', data.user.id)
+    .single();
+    console.log('Profile:', profile);
+  setMessage('登录成功！');
+  navigate(`/profile/${profile.id}`);
+};
+
 
   return (
     <div>
@@ -32,15 +46,19 @@ export default function Login() {
           type="email"
           placeholder="邮箱"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required />
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
         <input
           type="password"
           placeholder="密码"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required />
-        <button type="submit">登录</button>
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? '登录中...' : '登录'}
+        </button>
       </form>
       {message && <p>{message}</p>}
     </div>

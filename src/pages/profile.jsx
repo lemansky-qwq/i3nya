@@ -1,40 +1,40 @@
-import { useParams } from 'react-router-dom';
+// src/pages/profile.jsx
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 export default function Profile() {
   const { uid } = useParams();
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    async function fetchProfile() {
-      setLoading(true);
+    const fetchProfile = async () => {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profiles') // 确保你有这个表
         .select('*')
-        .eq('id', Number(uid))
+        .eq('id', uid) // id 是你保存的 uid，例如 1、2、3 或 Supabase 的 UUID
         .single();
 
-      if (error) {
-        console.error(error);
-        setProfile(null);
+      if (error || !data) {
+        setNotFound(true);
       } else {
         setProfile(data);
       }
-      setLoading(false);
-    }
+    };
+
     fetchProfile();
   }, [uid]);
 
-  if (loading) return <p>加载中...</p>;
-  if (!profile) return <p>用户不存在</p>;
+  if (notFound) return <p>用户不存在</p>;
+  if (!profile) return <p>加载中...</p>;
 
   return (
-    <div>
-      <h1>{profile.nickname || '匿名用户'}</h1>
-      <p>Email: {profile.email || '未公开'}</p>
-      {/* 更多资料展示 */}
+    <div style={{ padding: '1rem' }}>
+      <h1>用户资料</h1>
+      <p>UID: {profile.id}</p>
+      <p>昵称: {profile.nickname || '（未设置）'}</p>
+      <p>邮箱: {profile.email || '（未公开）'}</p>
     </div>
   );
 }
