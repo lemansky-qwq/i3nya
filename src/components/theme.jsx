@@ -56,7 +56,7 @@ function App() {
 
       {/* 右下角的切换按钮 */}
       <div className="theme-toggle-button" onClick={toggleSidebar}>
-        {isSidebarOpen ? '←' : '→'}
+        {isSidebarOpen ? '->' : '<-'}
       </div>
     </div>
   );
