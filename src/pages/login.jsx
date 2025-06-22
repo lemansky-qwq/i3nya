@@ -32,7 +32,6 @@ export default function Login() {
     .select('id')
     .eq('user_uuid', data.user.id)
     .single();
-    console.log('Profile:', profile);
   setMessage('登录成功！');
   navigate(`/profile/${profile.id}`);
 };
