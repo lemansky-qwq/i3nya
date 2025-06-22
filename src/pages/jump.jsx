@@ -14,12 +14,21 @@ export default function JumpGame() {
     const [charging, setCharging] = useState(false);
     const [chargeStart, setChargeStart] = useState(0);
     const [isJumping, setIsJumping] = useState(false);
+    
+function getTextColorByTheme() {
+  const bodyClassList = document.body.classList;
+  if (bodyClassList.contains('theme-light') || bodyClassList.contains('theme-spring')) {
+    return '#333';
+  }
+  return '#eee';
+}
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         canvas.width = 600;
         canvas.height = 300;
+        const textColor = getTextColorByTheme();
 
         const draw = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -38,7 +47,7 @@ export default function JumpGame() {
             ctx.fillStyle = gameOver ? 'red' : '#007bff';
             ctx.fillRect(player.x - viewOffset, player.y, 20, 20);
 
-            ctx.fillStyle = '#333';
+            ctx.fillStyle = textColor;
             ctx.font = '16px sans-serif';
             ctx.fillText(`得分：${score}`, 10, 20);
             ctx.fillText(`最高分：${highScore}`, 460, 20);

@@ -24,19 +24,19 @@ body {
 
 /* 夏季主题 - 深绿色背景，米白文字 */
 .theme-summer {
-  background-color: #2e4d2e; /* 深绿 */
+  background-color: #006a00; /* 深绿 */
   color: #f0f0e8; /* 浅米白 */
 }
 
 /* 秋季主题 - 橙棕背景，浅米色文字 */
 .theme-autumn {
-  background-color: #a65e2e; /* 橙棕 */
+  background-color: #ab4400; /* 橙棕 */
   color: #fff3e0; /* 浅米色 */
 }
 
 /* 冬季主题 - 银色背景，深蓝灰文字 */
 .theme-winter {
-  background-color: #cbd4db; /* 银色 */
+  background-color: #d4d4d4; /* 银色 */
   color: #2c3e50; /* 深蓝灰 */
 }
 
