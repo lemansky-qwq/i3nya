@@ -1,4 +1,3 @@
-// src/pages/jump.jsx - v6.4 精准判断只允许跳到“当前目标平台”，否则不加分不生成
 import { useEffect, useRef, useState } from 'react';
 
 export default function JumpGame() {
@@ -14,66 +13,11 @@ export default function JumpGame() {
     const [charging, setCharging] = useState(false);
     const [chargeStart, setChargeStart] = useState(0);
     const [isJumping, setIsJumping] = useState(false);
+    const [historyScores, setHistoryScores] = useState(() => {
+        return JSON.parse(localStorage.getItem('jumpHistoryScores') || '[]');
+    });
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        canvas.width = 600;
-        canvas.height = 300;
-
-        const draw = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const viewOffset = Math.max(0, player.x - 150);
-
-            ctx.fillStyle = '#eee';
-            ctx.fillRect(0, 280, canvas.width, 20);
-
-            ctx.fillStyle = '#888';
-            platforms.forEach((p, i) => {
-                ctx.fillStyle = (i === platforms.length - 1) ? '#555' : '#888';
-                ctx.fillRect(p.x - viewOffset, 260, p.width, 20);
-            });
-
-            ctx.fillStyle = gameOver ? 'red' : '#007bff';
-            ctx.fillRect(player.x - viewOffset, player.y, 20, 20);
-
-            ctx.fillStyle = '#333';
-            ctx.font = '16px sans-serif';
-            ctx.fillText(`得分：${score}`, 10, 20);
-            ctx.fillText(`最高分：${highScore}`, 460, 20);
-        };
-
-        draw();
-    }, [player, platforms, gameOver, score, highScore]);
-
-    const animateJump = (power) => {
-        setIsJumping(true);
-        const distance = Math.min(200, power * 2);
-        const jumpHeight = Math.min(100, power * 1.5);
-
-        let frame = 0;
-        const totalFrames = 30;
-        const startX = player.x;
-        const startY = player.y;
-
-        const jumpFrame = () => {
-            frame++;
-            const t = frame / totalFrames;
-            const x = startX + distance * t;
-            const y = startY - (4 * jumpHeight * t * (1 - t));
-            setPlayer({ x, y });
-
-            if (frame < totalFrames) {
-                requestAnimationFrame(jumpFrame);
-            } else {
-                finishJump(x);
-            }
-        };
-
-        requestAnimationFrame(jumpFrame);
-    };
-
+    // 游戏结束时检查分数并保存
     const finishJump = (x) => {
         const playerMidX = x + 10;
         const currentPlatform = platforms[platforms.length - 2]; // 倒数第二个
@@ -85,26 +29,27 @@ export default function JumpGame() {
         if (isOnNext) {
             setPlayer({ x, y: 250 });
             setScore(prev => prev + 1);
-            const difficultyScale = Math.min(score / 10, 1);
-            const minGap = 80 + difficultyScale * 40;
-            const maxGap = 140 + difficultyScale * 60;
-            const minWidth = 60 - difficultyScale * 20;
-            const maxWidth = 100 - difficultyScale * 30;
-
-            const newPlatform = {
-                x: nextPlatform.x + minGap + Math.random() * (maxGap - minGap),
-                width: minWidth + Math.random() * (maxWidth - minWidth),
-            };
-
-            setPlatforms([...platforms, newPlatform]);
         } else if (isOnCurrent) {
             setPlayer({ x, y: 250 });
         } else {
             setGameOver(true);
+
+            // 更新历史成绩
             if (score > highScore) {
                 setHighScore(score);
                 localStorage.setItem('jumpHighScore', score);
             }
+
+            // 将当前分数添加到历史成绩数组
+            const updatedHistoryScores = [...historyScores, score];
+
+            // 保证只保存最高的 5 次成绩
+            const topScores = updatedHistoryScores
+                .sort((a, b) => b - a) // 按分数降序排序
+                .slice(0, 5); // 保留前 5 个成绩
+
+            setHistoryScores(topScores);
+            localStorage.setItem('jumpHistoryScores', JSON.stringify(topScores));
         }
 
         setIsJumping(false);
@@ -137,6 +82,33 @@ export default function JumpGame() {
         }
     };
 
+    const animateJump = (power) => {
+        setIsJumping(true);
+        const distance = Math.min(200, power * 2);
+        const jumpHeight = Math.min(100, power * 1.5);
+
+        let frame = 0;
+        const totalFrames = 30;
+        const startX = player.x;
+        const startY = player.y;
+
+        const jumpFrame = () => {
+            frame++;
+            const t = frame / totalFrames;
+            const x = startX + distance * t;
+            const y = startY - (4 * jumpHeight * t * (1 - t));
+            setPlayer({ x, y });
+
+            if (frame < totalFrames) {
+                requestAnimationFrame(jumpFrame);
+            } else {
+                finishJump(x);
+            }
+        };
+
+        requestAnimationFrame(jumpFrame);
+    };
+
     return (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <h1>跳一跳！Jump 1 Jump 3.3</h1>
@@ -152,8 +124,8 @@ export default function JumpGame() {
                 <button
                     onMouseDown={startCharge}
                     onMouseUp={releaseJump}
-                    onTouchStart={(e) => { e.preventDefault(); startCharge(); }} // 防止长按选中文本
-                    onTouchEnd={(e) => { e.preventDefault(); releaseJump(); }}   // 防止长按选中文本
+                    onTouchStart={(e) => { e.preventDefault(); startCharge(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); releaseJump(); }}
                     disabled={isJumping}
                     style={{
                         marginTop: '1rem',
@@ -165,6 +137,20 @@ export default function JumpGame() {
                     {charging ? '蓄力中...' : '跳！'}
                 </button>
             )}
+
+            {/* 历史成绩显示 */}
+            <div>
+                <h3>最高 5 次成绩</h3>
+                {historyScores.length === 0 ? (
+                    <p>没有历史成绩</p>
+                ) : (
+                    <ul>
+                        {historyScores.map((score, index) => (
+                            <li key={index}>第 {index + 1} 局：{score} 分</li>
+                        ))}
+                    </ul>
+                )}
+            </div>
         </div>
     );
 }
