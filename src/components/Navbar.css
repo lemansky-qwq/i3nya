@@ -1,22 +1,46 @@
-/* Navbar.css */
+/* Navbar 样式 */
 .navbar {
+  background-color: #111;
+  color: white;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px;
-  background-color: #333;
-  color: white;
+  align-items: center;
+  border-bottom: 1px solid #333;
 }
 
-.navbar-left a {
-  margin-right: 15px;
+.navbar a {
   color: white;
+  margin-right: 1rem;
   text-decoration: none;
+  font-weight: bold;
 }
 
-.navbar-left a:hover {
-  text-decoration: underline;
+.navbar a:hover {
+  color: #0af;
 }
 
+.navbar button {
+  background: none;
+  border: 1px solid #aaa;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.navbar button:hover {
+  border-color: #0af;
+  color: #0af;
+}
+
+.navbar-left,
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+/* 主题切换按钮 */
 .theme-toggle-button {
   position: fixed;
   bottom: 20px;
@@ -38,22 +62,17 @@
 .theme-sidebar {
   position: fixed;
   top: 50%;
-  right: 0;
-  transform: translateY(-50%);
+  right: -210px; /* 初始位置，隐藏在右侧 */
   background-color: #333;
   width: 200px;
   padding: 20px;
   border-radius: 10px 0 0 10px;
   box-shadow: -4px 4px 10px rgba(0, 0, 0, 0.2);
-  opacity: 0;
-  visibility: hidden;
   transition: all 0.3s ease-in-out;
 }
 
 .theme-sidebar.open {
-  visibility: visible;
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  right: 0; /* 当展开时，改变位置 */
 }
 
 button {
