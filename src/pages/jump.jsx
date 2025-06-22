@@ -14,9 +14,6 @@ export default function JumpGame() {
     const [charging, setCharging] = useState(false);
     const [chargeStart, setChargeStart] = useState(0);
     const [isJumping, setIsJumping] = useState(false);
-    const [showLeaderboard, setShowLeaderboard] = useState(false);
-    const [leaderboard, setLeaderboard] = useState([]);
-
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -49,31 +46,6 @@ export default function JumpGame() {
 
         draw();
     }, [player, platforms, gameOver, score, highScore]);
-
-    const fetchLeaderboard = async () => {
-  const { data, error } = await supabase
-    .from('scores_jump')
-    .select('score, user_id')
-    .order('score', { ascending: false })
-    .limit(10);
-
-  if (error || !data) return;
-
-  // 获取昵称
-  const users = await Promise.all(data.map(async (entry) => {
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('nickname')
-      .eq('id', entry.user_id)
-      .single();
-    return {
-      score: entry.score,
-      nickname: profile?.nickname || '未知',
-    };
-  }));
-
-  setLeaderboard(users);
-};
 
     const animateJump = (power) => {
         setIsJumping(true);
@@ -111,15 +83,13 @@ export default function JumpGame() {
         const isOnCurrent = playerMidX >= currentPlatform.x && playerMidX <= currentPlatform.x + currentPlatform.width;
 
         if (isOnNext) {
-            // 成功跳到目标平台
             setPlayer({ x, y: 250 });
             setScore(prev => prev + 1);
-            // 根据得分增加难度
-            const difficultyScale = Math.min(score / 10, 1); // 0 到 1 之间
-            const minGap = 80 + difficultyScale * 40;        // 最小间距：80→120
-            const maxGap = 140 + difficultyScale * 60;       // 最大间距：140→200
-            const minWidth = 60 - difficultyScale * 20;      // 最小宽度：60→40
-            const maxWidth = 100 - difficultyScale * 30;     // 最大宽度：100→70
+            const difficultyScale = Math.min(score / 10, 1);
+            const minGap = 80 + difficultyScale * 40;
+            const maxGap = 140 + difficultyScale * 60;
+            const minWidth = 60 - difficultyScale * 20;
+            const maxWidth = 100 - difficultyScale * 30;
 
             const newPlatform = {
                 x: nextPlatform.x + minGap + Math.random() * (maxGap - minGap),
@@ -128,10 +98,8 @@ export default function JumpGame() {
 
             setPlatforms([...platforms, newPlatform]);
         } else if (isOnCurrent) {
-            // 跳回当前平台，存活但不加分
             setPlayer({ x, y: 250 });
         } else {
-            // 掉下去了
             setGameOver(true);
             if (score > highScore) {
                 setHighScore(score);
@@ -141,7 +109,6 @@ export default function JumpGame() {
 
         setIsJumping(false);
     };
-
 
     const reset = () => {
         setGameOver(false);
@@ -185,15 +152,19 @@ export default function JumpGame() {
                 <button
                     onMouseDown={startCharge}
                     onMouseUp={releaseJump}
-                    onTouchStart={startCharge}
-                    onTouchEnd={releaseJump}
+                    onTouchStart={(e) => { e.preventDefault(); startCharge(); }} // 防止长按选中文本
+                    onTouchEnd={(e) => { e.preventDefault(); releaseJump(); }}   // 防止长按选中文本
                     disabled={isJumping}
-                    style={{ marginTop: '1rem', padding: '1rem 2rem', fontSize: '1.2rem' }}
+                    style={{
+                        marginTop: '1rem',
+                        padding: '1rem 2rem',
+                        fontSize: '1.2rem',
+                        userSelect: 'none', // 禁止文字选中
+                    }}
                 >
                     {charging ? '蓄力中...' : '跳！'}
                 </button>
             )}
-
         </div>
     );
 }
