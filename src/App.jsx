@@ -8,7 +8,7 @@ import NotFound from './pages/notfound';
 import Navbar from './components/navbar';
 import JumpGame from './pages/jump';
 import Game2048 from './pages/2048';
-import './theme.css'; // 确保样式生效
+import '.components/theme.css'; // 确保样式生效
 
 const themes = ['light', 'dark', 'spring', 'summer', 'autumn', 'winter', 'nightmare', 'auto'];
 
