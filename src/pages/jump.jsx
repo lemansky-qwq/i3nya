@@ -18,17 +18,39 @@ export default function JumpGame() {
 function getTextColorByTheme() {
   const bodyClassList = document.body.classList;
 
-  if (bodyClassList.contains('theme-light') || bodyClassList.contains('theme-spring') || bodyClassList.contains('theme-winter')) {
-    return '#333'; // 浅色背景用深色文字
-  } 
-
-  if (bodyClassList.contains('theme-nightmare')) {
-    return '#ff0000'; // 噩梦主题红色文字
+  // 浅色背景主题：light, spring, winter（银色属于浅色）
+  if (
+    bodyClassList.contains('theme-light') ||
+    bodyClassList.contains('theme-spring') ||
+    bodyClassList.contains('theme-winter')
+  ) {
+    return '#333'; // 深色文字
   }
 
-  // 其余深色背景用白色文字
-  return '#eee';
+  // 噩梦特殊红色文字
+  if (bodyClassList.contains('theme-nightmare')) {
+    return '#ff0000';
+  }
+
+  // 深色背景主题：dark, summer, autumn
+  if (
+    bodyClassList.contains('theme-dark') ||
+    bodyClassList.contains('theme-summer') ||
+    bodyClassList.contains('theme-autumn')
+  ) {
+    return '#eee'; // 浅色文字
+  }
+
+  // auto模式（假设自动跟系统匹配）
+  if (bodyClassList.contains('theme-auto')) {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? '#eee' : '#333';
+  }
+
+  // 默认深色文字，防止意外
+  return '#333';
 }
+
 
 
     useEffect(() => {
