@@ -19,41 +19,53 @@ export default function JumpGame() {
 
     // 游戏结束时检查分数并保存
     const finishJump = (x) => {
-        const playerMidX = x + 10;
-        const currentPlatform = platforms[platforms.length - 2]; // 倒数第二个
-        const nextPlatform = platforms[platforms.length - 1];
+    const playerMidX = x + 10;
+    const currentPlatform = platforms[platforms.length - 2]; // 倒数第二个
+    const nextPlatform = platforms[platforms.length - 1];
 
-        const isOnNext = playerMidX >= nextPlatform.x && playerMidX <= nextPlatform.x + nextPlatform.width;
-        const isOnCurrent = playerMidX >= currentPlatform.x && playerMidX <= currentPlatform.x + currentPlatform.width;
+    const isOnNext = playerMidX >= nextPlatform.x && playerMidX <= nextPlatform.x + nextPlatform.width;
+    const isOnCurrent = playerMidX >= currentPlatform.x && playerMidX <= currentPlatform.x + currentPlatform.width;
 
-        if (isOnNext) {
-            setPlayer({ x, y: 250 });
-            setScore(prev => prev + 1);
-        } else if (isOnCurrent) {
-            setPlayer({ x, y: 250 });
-        } else {
-            setGameOver(true);
+    if (isOnNext) {
+        setPlayer({ x, y: 250 });
+        setScore(prev => prev + 1);
 
-            // 更新历史成绩
-            if (score > highScore) {
-                setHighScore(score);
-                localStorage.setItem('jumpHighScore', score);
-            }
+        // === 🔧 新增：根据得分生成新平台 ===
+        const difficultyScale = Math.min(score / 10, 1);
+        const minGap = 80 + difficultyScale * 40;
+        const maxGap = 140 + difficultyScale * 60;
+        const minWidth = 60 - difficultyScale * 20;
+        const maxWidth = 100 - difficultyScale * 30;
 
-            // 将当前分数添加到历史成绩数组
-            const updatedHistoryScores = [...historyScores, score];
+        const newPlatform = {
+            x: nextPlatform.x + minGap + Math.random() * (maxGap - minGap),
+            width: minWidth + Math.random() * (maxWidth - minWidth),
+        };
 
-            // 保证只保存最高的 5 次成绩
-            const topScores = updatedHistoryScores
-                .sort((a, b) => b - a) // 按分数降序排序
-                .slice(0, 5); // 保留前 5 个成绩
+        setPlatforms(prev => [...prev, newPlatform]);
 
-            setHistoryScores(topScores);
-            localStorage.setItem('jumpHistoryScores', JSON.stringify(topScores));
+    } else if (isOnCurrent) {
+        setPlayer({ x, y: 250 });
+    } else {
+        setGameOver(true);
+
+        if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('jumpHighScore', score);
         }
 
-        setIsJumping(false);
-    };
+        const updatedHistoryScores = [...historyScores, score];
+        const topScores = updatedHistoryScores
+            .sort((a, b) => b - a)
+            .slice(0, 5);
+
+        setHistoryScores(topScores);
+        localStorage.setItem('jumpHistoryScores', JSON.stringify(topScores));
+    }
+
+    setIsJumping(false);
+};
+
 
     const reset = () => {
         setGameOver(false);
