@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Navbar.css';
+import './navbar.css';
 
 export default function Navbar({ handleChangeTheme }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,7 +22,7 @@ export default function Navbar({ handleChangeTheme }) {
 
       {/* 右下角的主题切换按钮 */}
       <div className="theme-toggle-button" onClick={toggleSidebar}>
-        {isSidebarOpen ? '←' : '→'}
+        {isSidebarOpen ? '→' : '←'}
       </div>
 
       {/* 主题选择栏 */}

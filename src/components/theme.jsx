@@ -1,46 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import Navbar from './navbar';
-import './theme.css';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import './navbar.css';
 
-const themes = ['light', 'dark', 'spring', 'summer', 'autumn', 'winter', 'nightmare', 'auto'];
-
-function App() {
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'auto');
+export default function Navbar({ handleChangeTheme }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const detectSystemTheme = () => {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  };
-
-  const applyTheme = (theme) => {
-    themes.forEach(t => document.body.classList.remove(`theme-${t}`));
-    if (theme === 'auto') {
-      const systemTheme = detectSystemTheme();
-      document.body.classList.add(`theme-${systemTheme}`);
-    } else {
-      document.body.classList.add(`theme-${theme}`);
-    }
-    localStorage.setItem('theme', theme);
-  };
-
-  useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
-
-  const handleChangeTheme = (selectedTheme) => {
-    setTheme(selectedTheme);
-  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
-    <div className="App">
-      <h1>主题切换示例</h1>
-      <p>当前主题：{theme}</p>
+    <nav className="navbar">
+      <div className="navbar-left">
+        <Link to="/">首页</Link>
+        <Link to="/about">关于</Link>
+        <Link to="/games">小游戏</Link>
+      </div>
 
-      <Navbar handleChangeTheme={handleChangeTheme} />
+      <div className="theme-toggle-button" onClick={toggleSidebar}>
+        {isSidebarOpen ? '→' : '←'}
+      </div>
 
       <div className={`theme-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <button onClick={() => handleChangeTheme('auto')}>自动</button>
@@ -52,12 +31,6 @@ function App() {
         <button onClick={() => handleChangeTheme('winter')}>冬</button>
         <button onClick={() => handleChangeTheme('nightmare')}>噩梦</button>
       </div>
-
-      <div className="theme-toggle-button" onClick={toggleSidebar}>
-        {isSidebarOpen ? '→' : '←'}
-      </div>
-    </div>
+    </nav>
   );
 }
-
-export default App;
