@@ -32,6 +32,25 @@ const Game2048 = () => {
   const [highScore, setHighScore] = useState(() => {
     return parseInt(localStorage.getItem('highScore')) || 0;
   });
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+  let key = e.key;
+
+  // WASD 映射成 Arrow 键
+  if (key === 'w' || key === 'W') key = 'ArrowUp';
+  if (key === 'a' || key === 'A') key = 'ArrowLeft';
+  if (key === 's' || key === 'S') key = 'ArrowDown';
+  if (key === 'd' || key === 'D') key = 'ArrowRight';
+
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+    e.preventDefault();
+    handleMove(key);
+  }
+};
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [grid]);
 
   // 用来处理用户的点击方向按钮操作
   const handleMove = (direction) => {
@@ -60,7 +79,7 @@ const Game2048 = () => {
     <div className="game-container">
       <h1>2048</h1>
       <p>分数：{score}　最高分：{highScore}</p>
-      <p>点击按钮进行操作</p>
+      <p>点击下方按钮或键盘WASD进行操作</p>
       <div className="grid">
         {grid.map((row, i) =>
           <div className="row" key={i}>

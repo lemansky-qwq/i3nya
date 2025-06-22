@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navbar from './Navbar';
+import Navbar from './navbar';
 import './theme.css';
 
 function App() {
@@ -23,6 +23,7 @@ function App() {
     document.body.className = ''; // 清除现有的主题
     document.body.classList.add(`theme-${theme}`);
     localStorage.setItem('theme', theme); // 保存用户选择的主题
+    window.location.reload();
   };
 
   const handleChangeTheme = (selectedTheme) => {
