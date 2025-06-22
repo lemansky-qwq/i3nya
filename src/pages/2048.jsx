@@ -32,9 +32,6 @@ const Game2048 = () => {
   const [highScore, setHighScore] = useState(() => {
     return parseInt(localStorage.getItem('highScore')) || 0;
   });
-  const [historyScores, setHistoryScores] = useState(() => {
-    return JSON.parse(localStorage.getItem('historyScores')) || [];
-  });
 
   // 用来处理用户的点击方向按钮操作
   const handleMove = (direction) => {
@@ -51,24 +48,12 @@ const Game2048 = () => {
     }
   };
 
-  // 游戏结束时保存成绩
-  const endGame = () => {
-    const updatedScores = [...historyScores, score];
-
-    // 按照分数降序排序，并保留最高的 5 个分数
-    const topScores = updatedScores.sort((a, b) => b - a).slice(0, 5);
-
-    setHistoryScores(topScores);
-    localStorage.setItem('historyScores', JSON.stringify(topScores));
-  };
-
   // 游戏重开
   const resetGame = () => {
     const empty = generateEmptyGrid();
     const startGrid = addRandomNumber(addRandomNumber(empty));
     setGrid(startGrid);
     setScore(0);
-    endGame();
   };
 
   return (
@@ -87,7 +72,7 @@ const Game2048 = () => {
           </div>
         )}
       </div>
-
+      
       {/* 操作按钮 */}
       <div className="buttons-container">
         <button className="move-button" onClick={() => handleMove('ArrowUp')}>↑</button>
@@ -97,22 +82,8 @@ const Game2048 = () => {
         </div>
         <button className="move-button" onClick={() => handleMove('ArrowDown')}>↓</button>
       </div>
-
+      
       <button onClick={resetGame}>重开一局</button>
-
-      {/* 历史成绩显示 */}
-      <div>
-        <h3>最高 5 次成绩</h3>
-        {historyScores.length === 0 ? (
-          <p>没有历史成绩</p>
-        ) : (
-          <ul>
-            {historyScores.map((score, index) => (
-              <li key={index}>第 {index + 1} 名：{score} 分</li>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 };
