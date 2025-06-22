@@ -5,10 +5,12 @@ import './Navbar.css';
 export default function Navbar({ handleChangeTheme }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // 切换右侧的主题切换栏
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // 确认这里 handleChangeTheme 是函数
+  console.log('Navbar handleChangeTheme:', typeof handleChangeTheme);
 
   return (
     <nav className="navbar">
@@ -20,7 +22,7 @@ export default function Navbar({ handleChangeTheme }) {
 
       {/* 右下角的主题切换按钮 */}
       <div className="theme-toggle-button" onClick={toggleSidebar}>
-        {isSidebarOpen ? '→' : '←'}
+        {isSidebarOpen ? '←' : '→'}
       </div>
 
       {/* 主题选择栏 */}
