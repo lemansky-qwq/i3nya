@@ -3,30 +3,46 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import './navbar.css';
 
-export default function Navbar({ handleChangeTheme, user }) {
+interface NavbarProps {
+  handleChangeTheme: (theme: string) => void;
+  user: {
+    id: string;
+  } | null;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [profileId, setProfileId] = useState(null);
+  const [profileId, setProfileId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchProfileId() {
+    let isMounted = true;
+
+    const fetchProfileId = async () => {
       if (!user) {
         setProfileId(null);
         return;
       }
+
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_uuid', user.id)  // 这里根据你的 profiles 表字段名调整
+        .eq('user_uuid', user.id)
         .single();
+
       if (error) {
-        console.error('获取profile id失败', error);
+        console.error('获取 profile id 失败', error.message);
         setProfileId(null);
-      } else {
+      } else if (isMounted && data) {
         setProfileId(data.id);
       }
-    }
+    };
+
     fetchProfileId();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   const toggleSidebar = () => {
@@ -48,12 +64,16 @@ export default function Navbar({ handleChangeTheme, user }) {
       <div className="navbar-right">
         {user ? (
           <>
-            {profileId ? (
-              <Link to={`/profile/${profileId}`} className="nav-button">我的主页</Link>
+            {profileId !== null ? (
+              <Link to={`/profile/${profileId}`} className="nav-button">
+                我的主页
+              </Link>
             ) : (
               <span className="nav-button">加载中...</span>
             )}
-            <button className="nav-button" onClick={handleLogout}>登出</button>
+            <button className="nav-button" onClick={handleLogout}>
+              登出
+            </button>
           </>
         ) : (
           <>
@@ -63,21 +83,17 @@ export default function Navbar({ handleChangeTheme, user }) {
         )}
       </div>
 
-      {/* 右下角的主题切换按钮 */}
       <div className="theme-toggle-button" onClick={toggleSidebar}>
         {isSidebarOpen ? '→' : '←'}
       </div>
 
-      {/* 主题选择栏 */}
       <div className={`theme-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        <button onClick={() => handleChangeTheme('light')}>浅</button>
-        <button onClick={() => handleChangeTheme('dark')}>深</button>
-        <button onClick={() => handleChangeTheme('spring')}>春</button>
-        <button onClick={() => handleChangeTheme('summer')}>夏</button>
-        <button onClick={() => handleChangeTheme('autumn')}>秋</button>
-        <button onClick={() => handleChangeTheme('winter')}>冬</button>
-        <button onClick={() => handleChangeTheme('nightmare')}>噩梦</button>
+        {['light', 'dark', 'spring', 'summer', 'autumn', 'winter', 'nightmare'].map((theme) => (
+          <button key={theme} onClick={() => handleChangeTheme(theme)}>{theme}</button>
+        ))}
       </div>
     </nav>
   );
-}
+};
+
+export default Navbar;
