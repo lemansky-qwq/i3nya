@@ -89,7 +89,7 @@ export default function Profile() {
             )}
           </>
         ) : (
-          <p>{profile.bio || '这个用户没有填写签名。'}</p>
+          <p>{profile.bio || '这个人很懒，什么都没写'}</p>
         )}
       </div>
     </div>
