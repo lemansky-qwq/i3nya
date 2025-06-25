@@ -134,6 +134,11 @@ export default function JumpGame() {
             animateJump(power);
         }
     };
+    
+    document.addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+}, false);
+
 
     return (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>

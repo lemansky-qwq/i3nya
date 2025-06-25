@@ -11,6 +11,7 @@ import Game2048 from './pages/games/2048';
 import Login from './pages/login';
 import Register from './pages/register';
 import Profile from './pages/profile';
+import Leaderboard from './pages/games/score';
 import { supabase } from './lib/supabaseClient';  // 你自己的 supabase 客户端路径
 import './components/theme.css'; // 确保样式生效
 
@@ -70,6 +71,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/profile/:uid" element={<Profile />} />
+          <Route path="/games/score" element={<Leaderboard />} />
         </Routes>
       </div>
     </>

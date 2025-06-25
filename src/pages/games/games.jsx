@@ -6,6 +6,7 @@ export default function Games() {
     { title: '点击', path: '/games/click', description: '全站首发，致敬老牌魔王' },
     { title: '🕹️ 跳一跳', path: '/games/jump', description: 'Jump 1 Jump 3.4' },
     { title: '2048', path: '/games/2048', description: '2048 1.7' },
+    { title: '排行榜', path: '/games/score', description: '都有' },
   ];
 
   return (
