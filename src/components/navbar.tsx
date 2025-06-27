@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
       </div>
 
       <div className={`theme-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        {['light', 'dark', 'spring', 'summer', 'autumn', 'winter', 'nightmare'].map((theme) => (
+        {['浅', '深', '春', '夏', '秋', '冬', '噩梦'].map((theme) => (
           <button key={theme} onClick={() => handleChangeTheme(theme)}>{theme}</button>
         ))}
       </div>

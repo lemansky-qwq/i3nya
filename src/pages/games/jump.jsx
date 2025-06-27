@@ -140,6 +140,48 @@ export default function JumpGame() {
 }, false);
 
 
+const saveScore = async () => {
+  if (!user) {
+    setMessage('请先登录');
+    return;
+  }
+
+  // 查询该用户是否已有记录（jump 字段）
+  const { data: existing, error: fetchError } = await supabase
+    .from('gamescores')
+    .select('jump')
+    .eq('user_uuid', user.id)
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError) {
+    setMessage('查询失败: ' + fetchError.message);
+    return;
+  }
+
+  if (existing) {
+    if (score > existing.jump) {
+      const { error: updateError } = await supabase
+        .from('gamescores')
+        .update({ jump: score })
+        .eq('user_uuid', user.id);
+
+      setMessage(updateError ? '更新失败: ' + updateError.message : '新纪录，分数已更新');
+    } else {
+      setMessage(`未超过历史最高分：${existing.jump}，未更新`);
+    }
+  } else {
+    // ✔ 使用 upsert 防止并发问题
+    const { error } = await supabase
+      .from('gamescores')
+      .upsert({ user_uuid: user.id, jump: score }, { onConflict: ['user_uuid'] });
+
+    setMessage(error ? '插入失败: ' + error.message : '首次提交，分数已保存');
+  }
+};
+
+
+
     return (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
             <h1>跳一跳！Jump 1 Jump 3.4</h1>
