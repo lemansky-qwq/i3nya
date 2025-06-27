@@ -15,21 +15,28 @@ const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
   const [profileId, setProfileId] = useState<number | null>(null);
   const navigate = useNavigate();
 
+  const themes = [
+    { key: 'light', label: '浅' },
+    { key: 'dark', label: '深' },
+    { key: 'spring', label: '春' },
+    { key: 'summer', label: '夏' },
+    { key: 'autumn', label: '秋' },
+    { key: 'winter', label: '冬' },
+    { key: 'nightmare', label: '噩梦' },
+  ];
+
   useEffect(() => {
     let isMounted = true;
-
     const fetchProfileId = async () => {
       if (!user) {
         setProfileId(null);
         return;
       }
-
       const { data, error } = await supabase
         .from('profiles')
         .select('id')
         .eq('user_uuid', user.id)
         .single();
-
       if (error) {
         console.error('获取 profile id 失败', error.message);
         setProfileId(null);
@@ -37,9 +44,7 @@ const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
         setProfileId(data.id);
       }
     };
-
     fetchProfileId();
-
     return () => {
       isMounted = false;
     };
@@ -65,13 +70,11 @@ const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
         {user ? (
           <>
             {profileId !== null ? (
-              <Link to={`/profile/${profileId}`} className="nav-button">
-                我的主页
-              </Link>
+              <Link to={`/profile/${profileId}`} className="nav-button">我的主页</Link>
             ) : (
               <span className="nav-button">加载中...</span>
             )}
-            <button className="nav-button" onClick={handleLogout}>
+            <button type="button" className="nav-button" onClick={handleLogout}>
               登出
             </button>
           </>
@@ -84,12 +87,12 @@ const Navbar: React.FC<NavbarProps> = ({ handleChangeTheme, user }) => {
       </div>
 
       <div className="theme-toggle-button" onClick={toggleSidebar}>
-        {isSidebarOpen ? '→' : '←'}
+        {isSidebarOpen ? '退' : '喵'}
       </div>
 
       <div className={`theme-sidebar ${isSidebarOpen ? 'open' : ''}`}>
-        {['浅', '深', '春', '夏', '秋', '冬', '噩梦'].map((theme) => (
-          <button key={theme} onClick={() => handleChangeTheme(theme)}>{theme}</button>
+        {themes.map(({ key, label }) => (
+          <button key={key} onClick={() => handleChangeTheme(key)}>{label}</button>
         ))}
       </div>
     </nav>
