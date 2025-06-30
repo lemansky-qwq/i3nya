@@ -83,10 +83,10 @@ export default function JumpGame() {
                 .eq('user_uuid', user.id)
                 .single();
 
+            // 移除了updated_at字段
             let upsertData = {
                 user_uuid: user.id,
-                jump: score,
-                updated_at: new Date().toISOString()
+                jump: score
             };
 
             // 如果已有记录且新分数更高，或者没有记录
@@ -116,36 +116,6 @@ export default function JumpGame() {
             setMessage('操作失败: ' + error.message);
         }
     };
-
-    // 添加排行榜显示部分
-    const renderLeaderboard = () => (
-        <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
-            <h3>排行榜</h3>
-            {loading ? (
-                <p>加载中...</p>
-            ) : error ? (
-                <p style={{ color: 'red' }}>{error}</p>
-            ) : leaderboard.length === 0 ? (
-                <p>暂无数据</p>
-            ) : (
-                <ol style={{ listStyle: 'none', padding: 0 }}>
-                    {leaderboard.map((item, index) => (
-                        <li key={index} style={{ 
-                            display: 'flex', 
-                            justifyContent: 'space-between',
-                            padding: '8px 0',
-                            borderBottom: '1px solid #f0f0f0'
-                        }}>
-                            <span>
-                                <strong>{index + 1}. {item.profiles?.nickname || '匿名'}</strong>
-                            </span>
-                            <span>{item.jump}</span>
-                        </li>
-                    ))}
-                </ol>
-            )}
-        </div>
-    );
 
     // Game drawing
     useEffect(() => {
