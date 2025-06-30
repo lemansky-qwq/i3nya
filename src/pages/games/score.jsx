@@ -105,7 +105,6 @@ export default function GameLeaderboards() {
             <li key={idx} style={{ 
               margin: '8px 0', 
               padding: '10px',
-              background: idx % 2 === 0 ? '#f8f9fa' : 'white',
               borderRadius: '4px',
               display: 'flex',
               justifyContent: 'space-between'
@@ -127,12 +126,10 @@ export default function GameLeaderboards() {
       maxWidth: '800px', 
       margin: '0 auto', 
       padding: '20px',
-      backgroundColor: '#fff'
     }}>
       <h1 style={{ 
         textAlign: 'center', 
         marginBottom: '30px',
-        color: '#333'
       }}>游戏排行榜</h1>
       
       <div style={{
