@@ -1,5 +1,5 @@
-// src/pages/jump.jsx - v6.4 精准判断只允许跳到“当前目标平台”，否则不加分不生成
 import { useEffect, useRef, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function JumpGame() {
     const canvasRef = useRef(null);
@@ -14,9 +14,140 @@ export default function JumpGame() {
     const [charging, setCharging] = useState(false);
     const [chargeStart, setChargeStart] = useState(0);
     const [isJumping, setIsJumping] = useState(false);
+    const [user, setUser] = useState(null);
+    const [message, setMessage] = useState('');
+    const [leaderboard, setLeaderboard] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
+    // User authentication
+    useEffect(() => {
+        const getUser = async () => {
+            const { data } = await supabase.auth.getUser();
+            setUser(data.user);
+        };
+        getUser();
 
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
 
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
+    }, []);
+
+    // Fetch leaderboard
+    useEffect(() => {
+        const fetchLeaderboard = async () => {
+            setLoading(true);
+            setError(null);
+
+            try {
+                // 确保使用正确的排序方式（descending）
+                const { data, error } = await supabase
+                    .from('gamescores')
+                    .select('jump, profiles(nickname)')
+                    .not('jump', 'is', null)  // 确保只获取有jump分数的记录
+                    .order('jump', { ascending: false })  // 明确降序排列
+                    .limit(10);
+
+                if (error) throw error;
+
+                // 确保数据正确排序后再设置state
+                const sortedData = data.sort((a, b) => b.jump - a.jump);
+                setLeaderboard(sortedData);
+            } catch (err) {
+                setError('获取排行榜失败：' + err.message);
+                console.error('获取排行榜错误:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLeaderboard();
+    }, []);
+
+    // 修改后的saveScore函数
+    const saveScore = async () => {
+        if (!user) {
+            setMessage('请先登录');
+            return;
+        }
+
+        try {
+            // 首先检查用户是否存在记录
+            const { data: existing, error: fetchError } = await supabase
+                .from('gamescores')
+                .select('jump')
+                .eq('user_uuid', user.id)
+                .single();
+
+            let upsertData = {
+                user_uuid: user.id,
+                jump: score,
+                updated_at: new Date().toISOString()
+            };
+
+            // 如果已有记录且新分数更高，或者没有记录
+            if (!existing || (existing && score > existing.jump)) {
+                const { error: upsertError } = await supabase
+                    .from('gamescores')
+                    .upsert(upsertData, { onConflict: 'user_uuid' });
+
+                if (upsertError) throw upsertError;
+
+                setMessage(existing ? '新纪录，分数已更新' : '首次提交，分数已保存');
+                
+                // 刷新排行榜
+                const { data: newLeaderboard } = await supabase
+                    .from('gamescores')
+                    .select('jump, profiles(nickname)')
+                    .not('jump', 'is', null)
+                    .order('jump', { ascending: false })
+                    .limit(10);
+                
+                setLeaderboard(newLeaderboard);
+            } else {
+                setMessage(`未超过历史最高分：${existing.jump}，未更新`);
+            }
+        } catch (error) {
+            console.error('保存分数错误:', error);
+            setMessage('操作失败: ' + error.message);
+        }
+    };
+
+    // 添加排行榜显示部分
+    const renderLeaderboard = () => (
+        <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #eee', borderRadius: '8px' }}>
+            <h3>排行榜</h3>
+            {loading ? (
+                <p>加载中...</p>
+            ) : error ? (
+                <p style={{ color: 'red' }}>{error}</p>
+            ) : leaderboard.length === 0 ? (
+                <p>暂无数据</p>
+            ) : (
+                <ol style={{ listStyle: 'none', padding: 0 }}>
+                    {leaderboard.map((item, index) => (
+                        <li key={index} style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between',
+                            padding: '8px 0',
+                            borderBottom: '1px solid #f0f0f0'
+                        }}>
+                            <span>
+                                <strong>{index + 1}. {item.profiles?.nickname || '匿名'}</strong>
+                            </span>
+                            <span>{item.jump}</span>
+                        </li>
+                    ))}
+                </ol>
+            )}
+        </div>
+    );
+
+    // Game drawing
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -39,7 +170,6 @@ export default function JumpGame() {
 
             ctx.fillStyle = gameOver ? 'red' : '#007bff';
             ctx.fillRect(player.x - viewOffset, player.y, 20, 20);
-
         };
 
         draw();
@@ -74,7 +204,7 @@ export default function JumpGame() {
 
     const finishJump = (x) => {
         const playerMidX = x + 10;
-        const currentPlatform = platforms[platforms.length - 2]; // 倒数第二个
+        const currentPlatform = platforms[platforms.length - 2];
         const nextPlatform = platforms[platforms.length - 1];
 
         const isOnNext = playerMidX >= nextPlatform.x && playerMidX <= nextPlatform.x + nextPlatform.width;
@@ -135,9 +265,10 @@ export default function JumpGame() {
         }
     };
 
+
     return (
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <h1>跳一跳！Jump 1 Jump 3.4</h1>
+            <h1>跳一跳！Jump 1 Jump 3.6</h1>
             <canvas ref={canvasRef} style={{ border: '1px solid #ccc' }}></canvas>
             <p>得分：{score} | 最高分：{highScore}</p>
 
@@ -145,24 +276,28 @@ export default function JumpGame() {
                 <div>
                     <p style={{ color: 'red' }}>你掉了！</p>
                     <button onClick={reset}>重新开始</button>
+                    <button onClick={saveScore} style={{ marginLeft: '10px' }}>保存分数</button>
+                    {message && <p>{message}</p>}
                 </div>
             ) : (
                 <button
                     onMouseDown={startCharge}
                     onMouseUp={releaseJump}
-                    onTouchStart={(e) => { e.preventDefault(); startCharge(); }} // 防止长按选中文本
-                    onTouchEnd={(e) => { e.preventDefault(); releaseJump(); }}   // 防止长按选中文本
+                    onTouchStart={(e) => { e.preventDefault(); startCharge(); }}
+                    onTouchEnd={(e) => { e.preventDefault(); releaseJump(); }}
                     disabled={isJumping}
                     style={{
                         marginTop: '1rem',
                         padding: '1rem 2rem',
                         fontSize: '1.2rem',
-                        userSelect: 'none', // 禁止文字选中
+                        userSelect: 'none',
                     }}
                 >
                     {charging ? '蓄力中...' : '跳！'}
                 </button>
             )}
+
+            
         </div>
     );
 }
