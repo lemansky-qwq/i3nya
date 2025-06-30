@@ -37,6 +37,7 @@ export default function GameClick() {
     .from('gamescores')
     .select('click')
     .eq('user_uuid', user.id)
+    .order('click', { ascending: false })
     .limit(1)
     .maybeSingle();  // maybeSingle不会因无数据报错
 
